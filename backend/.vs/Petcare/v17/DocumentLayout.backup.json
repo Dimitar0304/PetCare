@@ -32,7 +32,7 @@
               "RelativeDocumentMoniker": "PetCare.Infrastructure\\Migrations\\20260112114217_initial.cs",
               "ToolTip": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Infrastructure\\Migrations\\20260112114217_initial.cs",
               "RelativeToolTip": "PetCare.Infrastructure\\Migrations\\20260112114217_initial.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAFgAAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-12T11:42:17.948Z",
               "EditorCaption": ""
@@ -66,6 +66,10 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
             }
           ]
         }
