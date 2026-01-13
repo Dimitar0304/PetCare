@@ -6,9 +6,9 @@ namespace PetCare.Core.Services.Contracts
     {
         public Task<AdResponseModel> CreateAnAdAsync(AdRequestModel model);
 
-        public Task<int> DeleteAdAsync();
+        public Task<int> DeleteAdAsync(string adId);
 
-        public Task<AdResponseModel> UpdateAdAsync(AdRequestModel model);
+        public Task UpdateAdAsync(AdRequestModel model,string adId);
 
         public Task<AdResponseModel> GetAdByIdAsync(string id);
 

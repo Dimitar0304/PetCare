@@ -12,6 +12,9 @@ builder.Services.AddOpenApi();
 
 var cString = builder.Configuration.GetConnectionString("ConnectionString");
 
+builder.Services.AddHttpContextAccessor();
+
+
 builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
    .AddNegotiate();
 builder.Services.AddDbContext<PetcareDbContext>(opt=> opt.UseNpgsql(cString));

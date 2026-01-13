@@ -3,16 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{17E71D6B-A60C-41C1-B790-158FB50ECED5}|PetCare.Core\\PetCare.Core.csproj|c:\\users\\lasss\\desktop\\petcare\\backend\\petcare.core\\services\\ad\\adservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{17E71D6B-A60C-41C1-B790-158FB50ECED5}|PetCare.Core\\PetCare.Core.csproj|solutionrelative:petcare.core\\services\\ad\\adservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{17E71D6B-A60C-41C1-B790-158FB50ECED5}|PetCare.Core\\PetCare.Core.csproj|c:\\users\\lasss\\desktop\\petcare\\backend\\petcare.core\\services\\ads\\adservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{17E71D6B-A60C-41C1-B790-158FB50ECED5}|PetCare.Core\\PetCare.Core.csproj|solutionrelative:petcare.core\\services\\ads\\adservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{17E71D6B-A60C-41C1-B790-158FB50ECED5}|PetCare.Core\\PetCare.Core.csproj|c:\\users\\lasss\\desktop\\petcare\\backend\\petcare.core\\services\\contracts\\iadservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{17E71D6B-A60C-41C1-B790-158FB50ECED5}|PetCare.Core\\PetCare.Core.csproj|solutionrelative:petcare.core\\services\\contracts\\iadservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{17E71D6B-A60C-41C1-B790-158FB50ECED5}|PetCare.Core\\PetCare.Core.csproj|c:\\users\\lasss\\desktop\\petcare\\backend\\petcare.core\\models\\adrequestmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{17E71D6B-A60C-41C1-B790-158FB50ECED5}|PetCare.Core\\PetCare.Core.csproj|solutionrelative:petcare.core\\models\\adrequestmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{614B1DB4-65E0-470D-9108-A05E3B0F22BB}|Petcare\\Petcare.csproj|c:\\users\\lasss\\desktop\\petcare\\backend\\petcare\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{614B1DB4-65E0-470D-9108-A05E3B0F22BB}|Petcare\\Petcare.csproj|solutionrelative:petcare\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E887B657-FEBA-4B04-9064-0183DAD53DC3}|PetCare.Infrastructure\\PetCare.Infrastructure.csproj|c:\\users\\lasss\\desktop\\petcare\\backend\\petcare.infrastructure\\data\\models\\ad.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E887B657-FEBA-4B04-9064-0183DAD53DC3}|PetCare.Infrastructure\\PetCare.Infrastructure.csproj|solutionrelative:petcare.infrastructure\\data\\models\\ad.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{17E71D6B-A60C-41C1-B790-158FB50ECED5}|PetCare.Core\\PetCare.Core.csproj|c:\\users\\lasss\\desktop\\petcare\\backend\\petcare.core\\models\\adresponsemodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -26,8 +30,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 6,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "IAdService.cs",
+              "DocumentMoniker": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Core\\Services\\Contracts\\IAdService.cs",
+              "RelativeDocumentMoniker": "PetCare.Core\\Services\\Contracts\\IAdService.cs",
+              "ToolTip": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Core\\Services\\Contracts\\IAdService.cs",
+              "RelativeToolTip": "PetCare.Core\\Services\\Contracts\\IAdService.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAAwAoAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-13T09:08:02.186Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
@@ -37,56 +54,57 @@
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "AdService.cs",
-              "DocumentMoniker": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Core\\Services\\Ad\\AdService.cs",
-              "RelativeDocumentMoniker": "PetCare.Core\\Services\\Ad\\AdService.cs",
-              "ToolTip": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Core\\Services\\Ad\\AdService.cs",
-              "RelativeToolTip": "PetCare.Core\\Services\\Ad\\AdService.cs",
-              "ViewState": "AgIAAAQAAAAAAAAAAAAAAAsAAAAfAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-12T13:32:57.059Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "AdRequestModel.cs",
-              "DocumentMoniker": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Core\\Models\\AdRequestModel.cs",
-              "RelativeDocumentMoniker": "PetCare.Core\\Models\\AdRequestModel.cs",
-              "ToolTip": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Core\\Models\\AdRequestModel.cs",
-              "RelativeToolTip": "PetCare.Core\\Models\\AdRequestModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAALAAAAAAAAAA==",
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\Petcare\\Program.cs",
+              "RelativeDocumentMoniker": "Petcare\\Program.cs",
+              "ToolTip": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\Petcare\\Program.cs",
+              "RelativeToolTip": "Petcare\\Program.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-12T13:28:23.293Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-13T07:30:58Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
+              "Title": "Ad.cs",
+              "DocumentMoniker": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Infrastructure\\Data\\Models\\Ad.cs",
+              "RelativeDocumentMoniker": "PetCare.Infrastructure\\Data\\Models\\Ad.cs",
+              "ToolTip": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Infrastructure\\Data\\Models\\Ad.cs",
+              "RelativeToolTip": "PetCare.Infrastructure\\Data\\Models\\Ad.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-13T06:55:33.136Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AdService.cs",
+              "DocumentMoniker": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Core\\Services\\Ads\\AdService.cs",
+              "RelativeDocumentMoniker": "PetCare.Core\\Services\\Ads\\AdService.cs",
+              "ToolTip": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Core\\Services\\Ads\\AdService.cs",
+              "RelativeToolTip": "PetCare.Core\\Services\\Ads\\AdService.cs",
+              "ViewState": "AgIAAEcAAAAAAAAAAAAwwJ8AAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-13T06:52:08.805Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "AdResponseModel.cs",
               "DocumentMoniker": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Core\\Models\\AdResponseModel.cs",
               "RelativeDocumentMoniker": "PetCare.Core\\Models\\AdResponseModel.cs",
               "ToolTip": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Core\\Models\\AdResponseModel.cs",
               "RelativeToolTip": "PetCare.Core\\Models\\AdResponseModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAALAAAAAAAAAA==",
+              "ViewState": "AgIAAAgAAAAAAAAAAAA0wA8AAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-12T13:28:10.038Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "IAdService.cs",
-              "DocumentMoniker": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Core\\Services\\Contracts\\IAdService.cs",
-              "RelativeDocumentMoniker": "PetCare.Core\\Services\\Contracts\\IAdService.cs",
-              "ToolTip": "C:\\Users\\lasss\\Desktop\\Petcare\\backend\\PetCare.Core\\Services\\Contracts\\IAdService.cs",
-              "RelativeToolTip": "PetCare.Core\\Services\\Contracts\\IAdService.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAAwA4AAAA8AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-12T12:58:27.212Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-13T06:43:49.267Z"
             }
           ]
         }
