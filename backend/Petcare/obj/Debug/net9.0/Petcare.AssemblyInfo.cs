@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Petcare")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+01046068c3c1c89c54393519a7479424ca400279")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0613bf4d80d8489b6391cbbec3f4de9e0cee92be")]
 [assembly: System.Reflection.AssemblyProductAttribute("Petcare")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Petcare")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

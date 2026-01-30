@@ -16,16 +16,16 @@ namespace PetCare.Infrastructure.Data.Models
 
         //Location
         public string Town { get; set; } = null!;
-        public string Xcordinates { get; set; } = null!;
-        public string Ycordinates { get; set; } = null!;
+        public string? Xcordinates { get; set; } = null!;
+        public string? Ycordinates { get; set; } = null!;
 
         //Price
         public decimal Price { get; set; }
 
         //Time
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         //Owner of Ad
         [ForeignKey(nameof(User))]

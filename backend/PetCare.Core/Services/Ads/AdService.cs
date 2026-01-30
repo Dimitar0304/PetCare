@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PetCare.Core.Models;
 using PetCare.Core.Services.Contracts;
@@ -12,8 +11,8 @@ namespace PetCare.Core.Services.Ads
     public class AdService : IAdService
     {
         private readonly PetcareDbContext context;
-        private readonly HttpContextAccessor httpContextAccessor;
-        public AdService(PetcareDbContext _context, HttpContextAccessor httpContextAccessor)
+        private readonly IHttpContextAccessor httpContextAccessor;
+        public AdService(PetcareDbContext _context, IHttpContextAccessor httpContextAccessor)
         {
             context = _context;
             this.httpContextAccessor = httpContextAccessor;
