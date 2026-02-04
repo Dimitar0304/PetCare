@@ -114,6 +114,7 @@ namespace PetCare.Core.Services.Ads
         {
             var ads = await context.Ads.Select(a=>new AdResponseModel()
             {
+                Id  =a.Id,
                 Title = a.Title,
                 Description=a.Description,
                 EndDate = a.EndDate,

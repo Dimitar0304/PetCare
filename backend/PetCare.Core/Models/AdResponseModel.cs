@@ -4,6 +4,7 @@ namespace PetCare.Core.Models
 {
     public class AdResponseModel
     {
+        public string Id { get; set; } = null!;
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
         public AdServiceType ServiceType { get; set; }
