@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using PetCare.Core.Models;
 using PetCare.Core.Services.Contracts;
 using PetCare.Infrastructure.Data;
 using PetCare.Infrastructure.Data.Models;
 using System.Security.Claims;
+using System;
 
 namespace PetCare.Core.Services.Ads
 {
@@ -34,12 +35,15 @@ namespace PetCare.Core.Services.Ads
             }
             var ad = new Ad()
             {
+                Id = Guid.NewGuid().ToString(),
                 Title = model.Title,
                 Description = model.Description,
                 Town = model.Town,
                 Price = model.Price,
-                EndDate = model.EndDate,
-                StartDate = model.StartDate,
+                // DB schema requires non-null StartDate/EndDate.
+                // If client doesn't provide them, default to a short care window.
+                StartDate = model.StartDate ?? DateTime.UtcNow,
+                EndDate = model.EndDate ?? (model.StartDate ?? DateTime.UtcNow).AddDays(7),
                 TypeService = model.ServiceType,
                 Ycordinates = model.Ycordinates,
                 Xcordinates = model.Xcordinates,
@@ -53,12 +57,13 @@ namespace PetCare.Core.Services.Ads
 
             return new AdResponseModel()
             {
+                Id = ad.Id,
                 IsTrue = true,
                 Title = model.Title,
                 Description = model.Description,
                 Price = model.Price,
-                EndDate = model.EndDate,
-                StartDate = model.StartDate,
+                EndDate = ad.EndDate,
+                StartDate = ad.StartDate,
                 ServiceType = model.ServiceType,
                 Xcordinates = model.Xcordinates,
                 Ycordinates = model.Ycordinates,
@@ -84,7 +89,7 @@ namespace PetCare.Core.Services.Ads
 
         public async Task<AdResponseModel> GetAdByIdAsync(string id)
         {
-            var ad = await context.Ads.FirstOrDefaultAsync(a => a.Id == id);
+            var ad = await context.Ads.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
 
             if(ad==null)
             {
@@ -97,6 +102,7 @@ namespace PetCare.Core.Services.Ads
 
             return new AdResponseModel()
             {
+                Id = ad.Id,
                 Title = ad.Title,
                 Description = ad.Description,
                 EndDate = ad.EndDate,
@@ -112,7 +118,7 @@ namespace PetCare.Core.Services.Ads
 
         public async Task<List<AdResponseModel>> GetAllAdsAsync()
         {
-            var ads = await context.Ads.Select(a=>new AdResponseModel()
+            var ads = await context.Ads.AsNoTracking().Select(a=>new AdResponseModel()
             {
                 Id  =a.Id,
                 Title = a.Title,
@@ -129,7 +135,8 @@ namespace PetCare.Core.Services.Ads
 
             if (ads.Count == 0)
             {
-                throw new ArgumentNullException();
+                // No ads is a valid state; the frontend should display an empty list.
+                return new List<AdResponseModel>();
             }
             return ads;
         }

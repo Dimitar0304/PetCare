@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using PetCare.Core.Services.Contracts;
 using PetCare.Infrastructure.Data.Models;
@@ -18,10 +18,21 @@ namespace PetCare.Core.Services.JWT
         }
         public string GenerateToken(User user)
         {
+            var roleLabel = user.Role switch
+            {
+                2 => "Seeker", // PetOwner
+                1 => "Provider", // Petcarer
+                _ => "Provider"
+            };
+
             var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Email, user.Email)
+            new Claim(ClaimTypes.Email, user.Email),
+            // Keep a simple claim key for the Angular frontend.
+            new Claim("role", roleLabel),
+            // Also include the standard claim type for compatibility with JWT decoders.
+            new Claim(ClaimTypes.Role, roleLabel)
         };
 
             var key = new SymmetricSecurityKey(

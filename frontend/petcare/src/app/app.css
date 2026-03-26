@@ -1,0 +1,5 @@
+/* Minimal app-wide styles; keep layout consistent with Bootstrap. */
+app-navbar {
+  display: block;
+}
+

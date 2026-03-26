@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PetCare.Core.Models;
 using PetCare.Core.Services.Contracts;
@@ -80,6 +80,7 @@ namespace Petcare.Controllers
             return Ok(result);
         }
         [HttpGet("getById")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             if (id == null)

@@ -1,59 +1,88 @@
-# Petcare
+# Petcare (Angular + ASP.NET Core + Leaflet)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.6.
+Angular (standalone components) frontend for the Petcare platform, connected to an ASP.NET Core Web API backend using JWT authentication.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- **Auth**: login, register, logout (JWT stored in `localStorage`)
+- **Roles**:
+  - **Seeker** (pet owner): can create and delete ads
+  - **Provider** (pet sitter): can browse ads (apply UI is placeholder)
+- **Ads**:
+  - Ads list (homepage) with **OpenStreetMap + Leaflet** map of Bulgaria
+  - Markers for each ad
+  - Click marker/card to view ad details
+  - Create ad (Seeker-only) with click-to-select coordinates on the map
+- **UX / Performance**:
+  - Request timeouts to avoid long “loading” hangs
+  - In-memory caching of ads list + ad details
 
-```bash
-ng serve
-```
+## Tech stack
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Angular (standalone) + RxJS
+- Bootstrap 5
+- Leaflet + OpenStreetMap
+- ASP.NET Core Web API + JWT
+- PostgreSQL (Npgsql)
 
-## Code scaffolding
+## Local setup
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Prerequisites
 
-```bash
-ng generate component component-name
-```
+- Node.js + npm
+- .NET SDK
+- PostgreSQL running locally
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Backend
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+From the repo root:
 
 ```bash
-ng test
+cd backend
+dotnet run --project Petcare/Petcare.csproj --urls "https://localhost:5001"
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+### Frontend
 
 ```bash
-ng e2e
+cd frontend/petcare
+npm install
+ng serve --port 4200
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Open `http://localhost:4200/`.
 
-## Additional Resources
+## Demo account (seeded)
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+If you started the backend at least once, it seeds demo data:
+
+- **Email**: `seed.user@petcare.local`
+- **Password**: `Seed1234!`
+- **Role**: `Seeker`
+
+## API base URL
+
+Frontend is configured to call:
+
+- `https://localhost:5001/api`
+
+## Project structure (frontend)
+
+```
+src/app/
+  ads/                # list/create/details pages
+  auth/               # login/register pages
+  core/
+    auth/             # AuthService (JWT)
+    guards/           # authGuard, seekerGuard
+    interceptors/     # JWT interceptor
+    map/              # Leaflet marker icon fix
+    services/         # AdsService
+  models/             # DTOs + app models
+  shared/             # navbar
+```
+
+## Notes
+
+- The map is centered on Bulgaria and uses the standard OSM tile layer.
+- Markers use a small icon configuration helper to avoid missing icons in bundlers.
