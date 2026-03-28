@@ -10,6 +10,7 @@ import { BackendRoles, LoginPayload, RegisterPayload, UserRole } from '../../mod
   selector: 'app-register',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  styleUrl: './register.component.css',
   template: `
     <div class="container py-4" style="max-width: 720px;">
       <h2 class="mb-3">Register</h2>

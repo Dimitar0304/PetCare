@@ -1,5 +1,30 @@
-/* Minimal app-wide styles; keep layout consistent with Bootstrap. */
-app-navbar {
-  display: block;
+/* ===== App-root global styles ===== */
+
+/* Ensure the router outlet fills the viewport height minus the navbar */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
+router-outlet + * {
+  flex: 1;
+}
+
+/* Smooth page transitions */
+router-outlet ~ * {
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Global spinner utility */
+.spinner-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+}

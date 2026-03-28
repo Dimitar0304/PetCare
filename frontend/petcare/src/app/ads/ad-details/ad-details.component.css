@@ -1,0 +1,64 @@
+/* ===== AdDetailsComponent ===== */
+
+:host {
+  display: block;
+}
+
+/* Details card */
+.details-card {
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.1);
+}
+
+.details-card .card-body {
+  padding: 1.5rem;
+}
+
+.ad-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.ad-city {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.ad-price-badge {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0d6efd;
+}
+
+.ad-service-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ad-description {
+  line-height: 1.7;
+  color: #333;
+}
+
+/* Location map card */
+.map-card {
+  border: none;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.1);
+}
+
+.map-card .map-inner {
+  height: 320px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Back link */
+.back-btn {
+  border-radius: 0.5rem;
+}

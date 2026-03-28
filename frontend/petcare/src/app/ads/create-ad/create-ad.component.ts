@@ -22,10 +22,13 @@ import { AdsService } from '../../core/services/ads.service';
 import { AdServiceType, CreateAdPayload } from '../../models/ad.models';
 import { BG_CITIES, BgCity } from '../../core/data/bg-cities';
 
+// Coordinates are optional; the backend stores them as nullable strings.
+
 @Component({
   selector: 'app-create-ad',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  styleUrl: './create-ad.component.css',
   template: `
     <div class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-3">
@@ -124,11 +127,14 @@ import { BG_CITIES, BgCity } from '../../core/data/bg-cities';
             </div>
 
             <div class="d-grid gap-2">
-              <button class="btn btn-primary" type="submit" [disabled]="form.invalid || loading">
+              <button class="btn btn-primary" type="submit" [disabled]="loading">
                 {{ loading ? 'Creating...' : 'Create Ad' }}
               </button>
             </div>
 
+            <div class="alert alert-success mt-3" *ngIf="successMsg">
+              {{ successMsg }}
+            </div>
             <div class="alert alert-danger mt-3" *ngIf="apiError">
               {{ apiError }}
             </div>
@@ -147,6 +153,7 @@ export class CreateAdComponent implements AfterViewInit, OnDestroy {
 
   loading = false;
   apiError: string | null = null;
+  successMsg: string | null = null;
   citySuggestions: BgCity[] = [];
 
   private map?: any;
@@ -166,8 +173,9 @@ export class CreateAdComponent implements AfterViewInit, OnDestroy {
     city: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
     serviceType: new FormControl<AdServiceType>(1, { nonNullable: true, validators: [Validators.required] }),
     price: new FormControl<number>(0, { nonNullable: true, validators: [Validators.required, Validators.min(0)] }),
-    latitude: new FormControl<number | null>(null, { validators: [Validators.required] }),
-    longitude: new FormControl<number | null>(null, { validators: [Validators.required] }),
+    // Coordinates are optional; user can click the map or pick a city from autocomplete.
+    latitude: new FormControl<number | null>(null),
+    longitude: new FormControl<number | null>(null),
   });
 
   get title() { return this.form.controls.title; }
@@ -239,7 +247,10 @@ export class CreateAdComponent implements AfterViewInit, OnDestroy {
   }
 
   onSubmit(): void {
+    this.form.markAllAsTouched();
     this.apiError = null;
+    this.successMsg = null;
+
     if (this.form.invalid) return;
 
     if (this.auth.getRole() !== 'Seeker') {
@@ -252,7 +263,7 @@ export class CreateAdComponent implements AfterViewInit, OnDestroy {
     const payload: CreateAdPayload = {
       title: raw.title,
       description: raw.description,
-      // <select [value]> always returns a string; cast back to number for the backend
+      // <select [value]> always returns a string; cast back to number for the backend.
       serviceType: Number(raw.serviceType) as AdServiceType,
       town: raw.city,
       xcordinates: raw.longitude != null ? String(raw.longitude) : undefined,
@@ -266,8 +277,16 @@ export class CreateAdComponent implements AfterViewInit, OnDestroy {
       .createAd(payload)
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: () => this.router.navigate(['/']),
-        error: () => (this.apiError = 'Failed to create ad. Please try again.'),
+        next: () => {
+          this.successMsg = 'Ad created! Redirecting…';
+          setTimeout(() => this.router.navigate(['/ads'], { state: { justCreated: true } }), 800);
+        },
+        error: (err) => {
+          const detail = err?.error?.errors ?? err?.error ?? null;
+          this.apiError = detail
+            ? `Failed to create ad: ${JSON.stringify(detail)}`
+            : 'Failed to create ad. Please try again.';
+        },
       });
   }
 }

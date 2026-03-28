@@ -9,6 +9,7 @@ import { MessageService } from '../../core/services/message.service';
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterModule],
+  styleUrl: './navbar.component.css',
   template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container">

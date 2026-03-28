@@ -11,6 +11,7 @@ import { Ad, AdServiceType } from '../../models/ad.models';
   selector: 'app-ad-details',
   standalone: true,
   imports: [CommonModule, RouterModule],
+  styleUrl: './ad-details.component.css',
   template: `
     <div class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-3">
@@ -181,7 +182,10 @@ export class AdDetailsComponent implements OnInit, OnDestroy {
 
   sendMessage(): void {
     if (!this.ad) return;
-    this.router.navigate(['/inbox'], { queryParams: { compose: true, to: this.ad.ownerId } });
+    // Pass ownerEmail so InboxComponent can pre-fill the recipient field.
+    this.router.navigate(['/inbox'], {
+      queryParams: { compose: true, to: this.ad.ownerEmail ?? '' },
+    });
   }
 }
 

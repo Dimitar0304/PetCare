@@ -72,6 +72,7 @@ export class AdsService {
     return {
       id: dto.id,
       ownerId: dto.ownerId,
+      ownerEmail: dto.ownerEmail,
       title: dto.title,
       description: dto.description,
       serviceType: dto.serviceType as AdServiceType,

@@ -21,6 +21,7 @@ import { Ad, AdServiceType } from '../../models/ad.models';
   selector: 'app-ads-list',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
+  styleUrl: './ads-list.component.css',
   template: `
     <div class="py-4">
       <div class="p-4 p-md-5 mb-4 rounded-3 bg-light border">
@@ -127,7 +128,9 @@ export class AdsListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.currentUserId = this.auth.getUserId();
-    this.loadAds();
+    // Force-refresh when navigating back from the create-ad form.
+    const forceRefresh = (history.state as { justCreated?: boolean })?.justCreated === true;
+    this.loadAds(forceRefresh);
   }
 
   ngAfterViewInit(): void {

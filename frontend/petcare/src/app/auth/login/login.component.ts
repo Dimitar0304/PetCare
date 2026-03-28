@@ -10,6 +10,7 @@ import { LoginPayload } from '../../models/auth.models';
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  styleUrl: './login.component.css',
   template: `
     <div class="container py-4" style="max-width: 520px;">
       <h2 class="mb-3">Login</h2>

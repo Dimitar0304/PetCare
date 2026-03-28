@@ -1,0 +1,51 @@
+/* ===== RegisterComponent ===== */
+
+:host {
+  display: flex;
+  justify-content: center;
+  padding-top: 3rem;
+}
+
+/* Auth card wrapper */
+.auth-card {
+  width: 100%;
+  max-width: 700px;
+  border: none;
+  border-radius: 0.85rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  padding: 2rem 2.25rem;
+  background: #fff;
+}
+
+.auth-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 1.5rem;
+}
+
+/* Input focus ring override */
+.form-control:focus,
+.form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.18);
+}
+
+/* Role selector */
+.form-select[formcontrolname='role'] {
+  cursor: pointer;
+}
+
+/* Submit button */
+.btn-register {
+  font-weight: 600;
+  padding: 0.55rem 1rem;
+  border-radius: 0.5rem;
+}
+
+/* Footer link */
+.auth-footer {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-top: 1rem;
+}

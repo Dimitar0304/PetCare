@@ -1,0 +1,70 @@
+/* ===== AdsListComponent ===== */
+
+:host {
+  display: block;
+}
+
+/* Hero / filter bar */
+.hero-bar {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+  color: #fff;
+  border-radius: 0.75rem;
+  padding: 2rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+}
+
+/* Map container */
+.map-container {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  height: 540px;
+}
+
+/* Ad cards */
+.ad-card {
+  border: none;
+  border-radius: 0.6rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ad-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+}
+
+.ad-card .card-body {
+  padding: 1rem 1.1rem;
+}
+
+.ad-price {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0d6efd;
+}
+
+.ad-service-type {
+  font-size: 0.75rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Scrollable card list */
+.ads-scroll {
+  max-height: 540px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+}
+
+.ads-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ads-scroll::-webkit-scrollbar-thumb {
+  background: #dee2e6;
+  border-radius: 2px;
+}

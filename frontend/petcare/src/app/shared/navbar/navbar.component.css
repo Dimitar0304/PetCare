@@ -1,0 +1,49 @@
+/* ===== NavbarComponent ===== */
+
+:host {
+  display: block;
+}
+
+/* Brand */
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+}
+
+/* Nav links */
+.navbar .nav-link {
+  font-size: 0.9rem;
+  padding-left: 0.9rem;
+  padding-right: 0.9rem;
+  border-radius: 0.35rem;
+  transition: background 0.15s ease;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Unread badge on Inbox link */
+.nav-link .badge {
+  font-size: 0.6rem;
+  padding: 0.2em 0.45em;
+  line-height: 1.1;
+}
+
+/* Account dropdown */
+.account-dropdown {
+  min-width: 220px;
+  z-index: 1050;
+  top: calc(100% + 6px);
+  border-radius: 0.6rem;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Account button */
+.btn-account {
+  border-radius: 0.4rem;
+  font-size: 0.85rem;
+}

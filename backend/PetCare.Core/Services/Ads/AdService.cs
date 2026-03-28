@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PetCare.Core.Models;
 using PetCare.Core.Services.Contracts;
@@ -13,6 +14,7 @@ namespace PetCare.Core.Services.Ads
     {
         private readonly PetcareDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
+
         public AdService(PetcareDbContext _context, IHttpContextAccessor httpContextAccessor)
         {
             context = _context;
@@ -59,6 +61,7 @@ namespace PetCare.Core.Services.Ads
             {
                 Id = ad.Id,
                 OwnerId = ad.OwnerId,
+                OwnerEmail = GetCurrentUserEmail() ?? string.Empty,
                 IsTrue = true,
                 Title = model.Title,
                 Description = model.Description,
@@ -97,58 +100,66 @@ namespace PetCare.Core.Services.Ads
 
         public async Task<AdResponseModel> GetAdByIdAsync(string id)
         {
-            var ad = await context.Ads.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+            var result = await context.Ads
+                .AsNoTracking()
+                .Where(a => a.Id == id)
+                .Join(context.Users,
+                      a => a.OwnerId,
+                      u => u.Id,
+                      (a, u) => new AdResponseModel
+                      {
+                          Id = a.Id,
+                          OwnerId = a.OwnerId,
+                          OwnerEmail = u.Email ?? string.Empty,
+                          Title = a.Title,
+                          Description = a.Description,
+                          EndDate = a.EndDate,
+                          StartDate = a.StartDate,
+                          ServiceType = a.TypeService,
+                          Price = a.Price,
+                          Xcordinates = a.Xcordinates,
+                          Ycordinates = a.Ycordinates,
+                          Town = a.Town,
+                          IsTrue = true
+                      })
+                .FirstOrDefaultAsync();
 
-            if(ad==null)
+            if (result == null)
             {
-                return new AdResponseModel()
+                return new AdResponseModel
                 {
                     IsTrue = false,
-                    Erors= new List<string>() { "Non Existing Ad"}
+                    Erors = new List<string> { "Non Existing Ad" }
                 };
             }
 
-            return new AdResponseModel()
-            {
-                Id = ad.Id,
-                OwnerId = ad.OwnerId,
-                Title = ad.Title,
-                Description = ad.Description,
-                EndDate = ad.EndDate,
-                StartDate = ad.StartDate,
-                ServiceType = ad.TypeService,
-                Price = ad.Price,
-                Xcordinates = ad.Xcordinates,
-                Ycordinates = ad.Ycordinates,
-                Town = ad.Town,
-                IsTrue = true
-            };
+            return result;
         }
 
         public async Task<List<AdResponseModel>> GetAllAdsAsync()
         {
-            var ads = await context.Ads.AsNoTracking().Select(a => new AdResponseModel()
-            {
-                Id = a.Id,
-                OwnerId = a.OwnerId,
-                Title = a.Title,
-                Description = a.Description,
-                EndDate = a.EndDate,
-                StartDate = a.StartDate,
-                Price = a.Price,
-                IsTrue = true,
-                ServiceType = a.TypeService,
-                Xcordinates = a.Xcordinates,
-                Ycordinates = a.Ycordinates,
-                Town = a.Town
-            }).ToListAsync();
-
-            if (ads.Count == 0)
-            {
-                // No ads is a valid state; the frontend should display an empty list.
-                return new List<AdResponseModel>();
-            }
-            return ads;
+            return await context.Ads
+                .AsNoTracking()
+                .Join(context.Users,
+                      a => a.OwnerId,
+                      u => u.Id,
+                      (a, u) => new AdResponseModel
+                      {
+                          Id = a.Id,
+                          OwnerId = a.OwnerId,
+                          OwnerEmail = u.Email ?? string.Empty,
+                          Title = a.Title,
+                          Description = a.Description,
+                          EndDate = a.EndDate,
+                          StartDate = a.StartDate,
+                          Price = a.Price,
+                          IsTrue = true,
+                          ServiceType = a.TypeService,
+                          Xcordinates = a.Xcordinates,
+                          Ycordinates = a.Ycordinates,
+                          Town = a.Town
+                      })
+                .ToListAsync();
         }
 
         public async Task UpdateAdAsync(AdRequestModel model, string adId)
@@ -181,11 +192,18 @@ namespace PetCare.Core.Services.Ads
             var user = httpContextAccessor.HttpContext?.User;
             if (user == null) return null;
 
-            // .NET 9 JsonWebTokenHandler may not remap short JWT claim names unless
-            // MapInboundClaims=true. Try full CLR type, then short names as fallback.
             return user.FindFirstValue(ClaimTypes.NameIdentifier)
                 ?? user.FindFirstValue("nameid")
                 ?? user.FindFirstValue("sub");
+        }
+
+        private string? GetCurrentUserEmail()
+        {
+            var user = httpContextAccessor.HttpContext?.User;
+            if (user == null) return null;
+
+            return user.FindFirstValue(ClaimTypes.Email)
+                ?? user.FindFirstValue("email");
         }
     }
 }

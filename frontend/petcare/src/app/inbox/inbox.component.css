@@ -1,0 +1,73 @@
+/* ===== InboxComponent ===== */
+
+:host {
+  display: block;
+}
+
+/* Page header */
+.inbox-header {
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+/* Compose panel */
+.compose-panel {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+}
+
+.compose-panel .card-header {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Message list */
+.message-item {
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.message-item:hover {
+  background-color: #f0f4ff;
+  border-left-color: #0d6efd;
+}
+
+.message-item.unread {
+  border-left-color: #dc3545;
+  background-color: #fff8f8;
+}
+
+.message-subject {
+  font-size: 0.95rem;
+}
+
+.message-meta {
+  font-size: 0.78rem;
+  color: #6c757d;
+}
+
+/* Message detail card */
+.message-detail {
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.09);
+}
+
+.message-detail .card-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Tab nav */
+.nav-tabs .nav-link {
+  color: #495057;
+  font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+  color: #0d6efd;
+  border-bottom-color: #0d6efd;
+}

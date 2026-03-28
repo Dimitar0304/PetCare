@@ -6,6 +6,7 @@ namespace PetCare.Core.Models
     {
         public string Id { get; set; } = null!;
         public string OwnerId { get; set; } = string.Empty;
+        public string OwnerEmail { get; set; } = string.Empty;
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
         public AdServiceType ServiceType { get; set; }

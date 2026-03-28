@@ -18,6 +18,7 @@ type Tab = 'inbox' | 'sent';
   selector: 'app-inbox',
   standalone: true,
   imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  styleUrl: './inbox.component.css',
   template: `
     <div class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-4">
@@ -184,8 +185,9 @@ export class InboxComponent implements OnInit {
     this.route.queryParams.subscribe((params) => {
       if (params['compose'] === 'true') {
         this.openCompose();
-        if (params['to']) {
-          // pre-fill recipient if provided (ownerId won't be an email, but we support email-based lookup)
+        const to = params['to'];
+        if (to && to.includes('@')) {
+          this.composeForm.patchValue({ recipientEmail: to });
         }
       }
     });
