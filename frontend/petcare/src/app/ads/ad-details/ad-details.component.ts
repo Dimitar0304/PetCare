@@ -1,7 +1,6 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { finalize } from 'rxjs';
 import * as L from 'leaflet';
 
 import { AdsService } from '../../core/services/ads.service';
@@ -86,6 +85,7 @@ export class AdDetailsComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   @ViewChild('mapEl', { static: false }) mapEl?: ElementRef<HTMLDivElement>;
 
@@ -134,19 +134,20 @@ export class AdDetailsComponent implements OnInit, OnDestroy {
 
     this.adsService
       .getAdById(id)
-      .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: (ad) => {
           this.ad = ad;
+          this.loading = false;
           this.isOwner = !!this.currentUserId && ad.ownerId === this.currentUserId;
-          // mapEl lives inside *ngIf="!loading && ad", so it doesn't exist in the DOM yet.
-          // setTimeout(0) defers renderMap until after Angular's next change-detection cycle
-          // creates the element.
           if (ad.latitude != null && ad.longitude != null) {
-            setTimeout(() => this.renderMap(ad.latitude!, ad.longitude!), 0);
+            // detectChanges() synchronously flushes the *ngIf and populates @ViewChild
+            // so mapEl is guaranteed to exist when renderMap() is called below.
+            this.cdr.detectChanges();
+            this.renderMap(ad.latitude!, ad.longitude!);
           }
         },
         error: () => {
+          this.loading = false;
           this.apiError = 'Failed to load ad details.';
         },
       });

@@ -252,7 +252,8 @@ export class CreateAdComponent implements AfterViewInit, OnDestroy {
     const payload: CreateAdPayload = {
       title: raw.title,
       description: raw.description,
-      serviceType: raw.serviceType,
+      // <select [value]> always returns a string; cast back to number for the backend
+      serviceType: Number(raw.serviceType) as AdServiceType,
       town: raw.city,
       xcordinates: raw.longitude != null ? String(raw.longitude) : undefined,
       ycordinates: raw.latitude != null ? String(raw.latitude) : undefined,

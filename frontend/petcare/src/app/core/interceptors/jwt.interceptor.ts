@@ -3,16 +3,20 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Observable } from 'rxjs';
 
 import { AuthService } from '../auth/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
   private readonly auth = inject(AuthService);
-  private readonly apiBase = 'https://localhost:5001/api';
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const token = this.auth.getToken();
 
-    const isBackendCall = req.url.startsWith(this.apiBase);
+    // Match both absolute URLs (dev: https://localhost:5001/api)
+    // and relative paths (prod Docker: /api)
+    const apiBase = environment.apiBase;
+    const isBackendCall = req.url.startsWith(apiBase) || req.url.startsWith('/api');
+
     if (!token || !isBackendCall) {
       return next.handle(req);
     }
@@ -23,9 +27,7 @@ export class JwtInterceptor implements HttpInterceptor {
 
     return next.handle(
       req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
+        setHeaders: { Authorization: `Bearer ${token}` },
       })
     );
   }
