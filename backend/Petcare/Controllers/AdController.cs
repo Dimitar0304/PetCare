@@ -63,21 +63,26 @@ namespace Petcare.Controllers
         }
 
         [HttpPost("delete")]
-        public IActionResult DeleteAdById(string id)
+        public async Task<IActionResult> DeleteAdById(string id)
         {
             if (id == null)
             {
                 return BadRequest();
             }
 
-            var result = service.DeleteAdAsync(id);
-
-            if (!result.IsCompleted)
+            try
             {
-                return BadRequest(result);
+                await service.DeleteAdAsync(id);
+                return Ok();
             }
-
-            return Ok(result);
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (ArgumentNullException)
+            {
+                return NotFound();
+            }
         }
         [HttpGet("getById")]
         [AllowAnonymous]

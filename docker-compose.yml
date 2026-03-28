@@ -1,0 +1,52 @@
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: petcare
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"           # optional: expose to host for DB tools
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d petcare"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  # ── ASP.NET Core backend ────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: "http://+:80"
+      ConnectionStrings__ConnectionString: "Server=db;Port=5432;Database=petcare;User Id=postgres;Password=postgres;Timeout=10;Command Timeout=30;Keepalive=30;Pooling=true;Maximum Pool Size=100;"
+      Jwt__Key: "SUPER_SECRET_KEY_1234567893443434"
+      Jwt__Issuer: "PetCareAPI"
+      Jwt__Audience: "PetCareClient"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5001:80"             # optional: expose backend directly for debugging
+
+  # ── Angular frontend (nginx) ────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend/petcare
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "4200:80"             # http://localhost:4200 in your browser
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

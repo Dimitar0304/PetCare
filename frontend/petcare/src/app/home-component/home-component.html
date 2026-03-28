@@ -1,0 +1,11 @@
+<div class="home-page">
+  <h1>Welcome {{ username ? username : 'Guest' }}</h1>
+
+  <div *ngIf="!auth.getToken()">
+    <a routerLink="/login">Login</a>
+  </div>
+
+  <div *ngIf="auth.getToken()">
+    <button (click)="logout()">Logout</button>
+  </div>
+</div>

@@ -2,6 +2,7 @@ export type AdServiceType = 1 | 2 | 3 | 4 | 5;
 
 export interface AdDto {
   id: string;
+  ownerId?: string;
   title: string;
   description: string;
   serviceType: AdServiceType;
@@ -18,6 +19,7 @@ export interface AdDto {
 
 export interface Ad {
   id: string;
+  ownerId?: string;
   title: string;
   description: string;
   serviceType: AdServiceType;

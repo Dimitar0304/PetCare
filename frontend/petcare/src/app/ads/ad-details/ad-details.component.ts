@@ -6,7 +6,7 @@ import * as L from 'leaflet';
 
 import { AdsService } from '../../core/services/ads.service';
 import { AuthService } from '../../core/auth/auth.service';
-import { Ad } from '../../models/ad.models';
+import { Ad, AdServiceType } from '../../models/ad.models';
 
 @Component({
   selector: 'app-ad-details',
@@ -41,7 +41,7 @@ import { Ad } from '../../models/ad.models';
                   </div>
                   <div class="text-end">
                     <div class="h5 mb-0">{{ ad.price }} BGN</div>
-                    <div class="text-muted small">Type: {{ ad.serviceType }}</div>
+                    <div class="text-muted small">{{ serviceLabel(ad.serviceType) }}</div>
                   </div>
                 </div>
 
@@ -54,11 +54,13 @@ import { Ad } from '../../models/ad.models';
                 </div>
 
                 <div class="mt-3 d-flex gap-2">
-                  <button class="btn btn-primary" type="button" *ngIf="role === 'Provider'" disabled>
-                    Apply (coming soon)
+                  <button class="btn btn-primary" type="button"
+                    *ngIf="!isOwner && role === 'Provider'"
+                    (click)="sendMessage()">
+                    Message owner
                   </button>
 
-                  <button class="btn btn-outline-danger" type="button" *ngIf="role === 'Seeker'" (click)="deleteAd()">
+                  <button class="btn btn-outline-danger" type="button" *ngIf="isOwner" (click)="deleteAd()">
                     Delete
                   </button>
                 </div>
@@ -92,12 +94,27 @@ export class AdDetailsComponent implements OnInit, OnDestroy {
   ad: Ad | null = null;
 
   role: 'Seeker' | 'Provider' | null = null;
+  isOwner = false;
 
+  private currentUserId: string | null = null;
+
+  private readonly serviceLabels: Record<AdServiceType, string> = {
+    1: 'Dog Walking',
+    2: 'Feeding Animal',
+    3: 'Overnight Care',
+    4: 'Pet Sitting',
+    5: 'Something Specific',
+  };
+
+  serviceLabel(type: AdServiceType): string {
+    return this.serviceLabels[type] ?? `Type ${type}`;
+  }
   private map?: any;
   private marker?: any;
 
   ngOnInit(): void {
     this.role = this.auth.getRole();
+    this.currentUserId = this.auth.getUserId();
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
       this.apiError = 'Invalid ad id.';
@@ -121,9 +138,12 @@ export class AdDetailsComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (ad) => {
           this.ad = ad;
-          // Render map if we have coordinates.
-          if (this.mapEl && ad.latitude != null && ad.longitude != null) {
-            this.renderMap(ad.latitude, ad.longitude);
+          this.isOwner = !!this.currentUserId && ad.ownerId === this.currentUserId;
+          // mapEl lives inside *ngIf="!loading && ad", so it doesn't exist in the DOM yet.
+          // setTimeout(0) defers renderMap until after Angular's next change-detection cycle
+          // creates the element.
+          if (ad.latitude != null && ad.longitude != null) {
+            setTimeout(() => this.renderMap(ad.latitude!, ad.longitude!), 0);
           }
         },
         error: () => {
@@ -147,8 +167,7 @@ export class AdDetailsComponent implements OnInit, OnDestroy {
   }
 
   deleteAd(): void {
-    if (!this.ad) return;
-    if (this.role !== 'Seeker') return;
+    if (!this.ad || !this.isOwner) return;
 
     const ok = confirm(`Delete ad "${this.ad.title}"?`);
     if (!ok) return;
@@ -157,6 +176,11 @@ export class AdDetailsComponent implements OnInit, OnDestroy {
       next: () => this.router.navigate(['/ads']),
       error: () => (this.apiError = 'Failed to delete ad.'),
     });
+  }
+
+  sendMessage(): void {
+    if (!this.ad) return;
+    this.router.navigate(['/inbox'], { queryParams: { compose: true, to: this.ad.ownerId } });
   }
 }
 

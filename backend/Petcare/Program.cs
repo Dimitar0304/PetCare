@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using PetCare.Core.Services.Ads;
 using PetCare.Core.Services.Contracts;
 using PetCare.Core.Services.JWT;
+using PetCare.Core.Services.Messages;
 using PetCare.Infrastructure.Data;
 using PetCare.Infrastructure.Data.Models;
 using System;
@@ -29,26 +30,39 @@ builder.Services.AddIdentity<User, IdentityRole>(opt=>
 
 builder.Services.AddTransient<IAdService, AdService>();
 builder.Services.AddScoped<IJwtService, JWTService>();
+builder.Services.AddTransient<IMessageService, MessageService>();
 
 builder.Services.AddOpenApi();
 
 var cString = builder.Configuration.GetConnectionString("ConnectionString");
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+// AddIdentity (above) registers cookie auth as the default challenge scheme.
+// We must explicitly override all three default scheme properties so that
+// unauthenticated API calls get 401/403 instead of a redirect to /Account/Login.
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme             = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    // .NET 9 JsonWebTokenHandler does not auto-remap short claim names;
+    // MapInboundClaims = true restores the classic ClaimTypes.NameIdentifier mapping.
+    options.MapInboundClaims = true;
+
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-        };
-    });
+        ValidateIssuer           = true,
+        ValidateAudience         = true,
+        ValidateLifetime         = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer              = builder.Configuration["Jwt:Issuer"],
+        ValidAudience            = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey         = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
 
 // DbContext pooling reduces allocations and improves throughput/latency.
 builder.Services.AddDbContextPool<PetcareDbContext>(opt =>
@@ -79,6 +93,25 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
+        // In Docker, the DB container may need a moment to be fully ready.
+        // Retry migration up to 10 times with increasing delays.
+        const int maxRetries = 10;
+        for (var attempt = 1; attempt <= maxRetries; attempt++)
+        {
+            try
+            {
+                await db.Database.MigrateAsync();
+                Console.WriteLine("[Startup] Database migration applied.");
+                break;
+            }
+            catch (Exception migEx) when (attempt < maxRetries)
+            {
+                var delay = attempt * 2;
+                Console.WriteLine($"[Startup] Migration attempt {attempt} failed ({migEx.Message}). Retrying in {delay}s...");
+                await Task.Delay(TimeSpan.FromSeconds(delay));
+            }
+        }
+
         // Ensure a known demo user exists (ads require OwnerId).
         var seedEmail = "seed.user@petcare.local";
         var seedUsername = "seed.user";
@@ -199,7 +232,12 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// Only redirect to HTTPS in Development (where dev certs exist).
+// In Docker/Production the app is behind nginx on HTTP only.
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("CorsPolicy");
 

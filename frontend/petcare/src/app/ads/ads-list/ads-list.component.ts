@@ -15,7 +15,7 @@ import { FormsModule } from '@angular/forms';
 
 import { AdsService } from '../../core/services/ads.service';
 import { AuthService } from '../../core/auth/auth.service';
-import { Ad } from '../../models/ad.models';
+import { Ad, AdServiceType } from '../../models/ad.models';
 
 @Component({
   selector: 'app-ads-list',
@@ -36,6 +36,7 @@ import { Ad } from '../../models/ad.models';
                 class="form-control"
                 placeholder="Filter by city (e.g. Sofia)"
                 [(ngModel)]="cityFilter"
+                (ngModelChange)="applyFilter()"
               />
             </div>
             <div class="col-md-auto">
@@ -66,7 +67,7 @@ import { Ad } from '../../models/ad.models';
                   </div>
                   <div class="text-end">
                     <div class="fw-semibold">{{ ad.price }} BGN</div>
-                    <div class="text-muted small">Type: {{ ad.serviceType }}</div>
+                    <div class="text-muted small">{{ serviceLabel(ad.serviceType) }}</div>
                   </div>
                 </div>
 
@@ -77,7 +78,7 @@ import { Ad } from '../../models/ad.models';
                   <button
                     class="btn btn-sm btn-outline-danger"
                     type="button"
-                    *ngIf="role === 'Seeker'"
+                    *ngIf="isOwner(ad)"
                     (click)="deleteAd(ad); $event.stopPropagation()"
                   >
                     Delete
@@ -87,7 +88,7 @@ import { Ad } from '../../models/ad.models';
             </div>
           </div>
 
-          <div *ngIf="!loading && ads.length === 0" class="text-muted">
+          <div *ngIf="!loading && filteredAds.length === 0 && !apiError" class="text-muted">
             No ads available.
           </div>
         </div>
@@ -106,14 +107,26 @@ export class AdsListComponent implements OnInit, AfterViewInit, OnDestroy {
   filteredAds: Ad[] = [];
   loading = false;
   apiError: string | null = null;
-  role: 'Seeker' | 'Provider' | null = null;
   cityFilter = '';
 
+  private readonly serviceLabels: Record<AdServiceType, string> = {
+    1: 'Dog Walking',
+    2: 'Feeding Animal',
+    3: 'Overnight Care',
+    4: 'Pet Sitting',
+    5: 'Something Specific',
+  };
+
+  serviceLabel(type: AdServiceType): string {
+    return this.serviceLabels[type] ?? `Type ${type}`;
+  }
+
+  private currentUserId: string | null = null;
   private map?: any;
   private markers: any[] = [];
 
   ngOnInit(): void {
-    this.role = this.auth.getRole();
+    this.currentUserId = this.auth.getUserId();
     this.loadAds();
   }
 
@@ -129,6 +142,10 @@ export class AdsListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   reload(force = false): void {
     this.loadAds(force);
+  }
+
+  isOwner(ad: Ad): boolean {
+    return !!this.currentUserId && ad.ownerId === this.currentUserId;
   }
 
   private initMap(): void {
@@ -153,32 +170,22 @@ export class AdsListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.adsService
       .getAds(force)
-      .pipe(
-        finalize(() => {
-          this.loading = false;
-        })
-      )
+      .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: (ads) => {
           this.ads = ads;
           this.applyFilter();
           this.renderMarkers();
         },
-        error: (err) => {
+        error: () => {
           this.apiError = 'Failed to load ads.';
-          // Keep state, but remove stale markers.
           this.markers.forEach((m) => m.remove());
           this.markers = [];
         },
       });
   }
 
-  ngDoCheck(): void {
-    // Cheap filter recalculation for better UX
-    this.applyFilter();
-  }
-
-  private applyFilter(): void {
+  applyFilter(): void {
     const q = this.cityFilter.trim().toLowerCase();
     this.filteredAds = !q ? this.ads : this.ads.filter((a) => a.city.toLowerCase().includes(q));
   }
@@ -203,7 +210,7 @@ export class AdsListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   deleteAd(ad: Ad): void {
-    if (this.role !== 'Seeker') return;
+    if (!this.isOwner(ad)) return;
     const ok = confirm(`Delete ad "${ad.title}"?`);
     if (!ok) return;
 
@@ -213,4 +220,3 @@ export class AdsListComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 }
-

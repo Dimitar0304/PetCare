@@ -58,6 +58,7 @@ namespace PetCare.Core.Services.Ads
             return new AdResponseModel()
             {
                 Id = ad.Id,
+                OwnerId = ad.OwnerId,
                 IsTrue = true,
                 Title = model.Title,
                 Description = model.Description,
@@ -75,12 +76,19 @@ namespace PetCare.Core.Services.Ads
 
         public async Task<int> DeleteAdAsync(string id)
         {
-            var ad = context.Ads.FirstOrDefault(a => a.Id == id);
+            var userId = GetCurrentUserId();
+            var ad = await context.Ads.FirstOrDefaultAsync(a => a.Id == id);
 
-            if(ad==null)
+            if (ad == null)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(id), "Ad not found.");
             }
+
+            if (ad.OwnerId != userId)
+            {
+                throw new UnauthorizedAccessException("You can only delete your own ads.");
+            }
+
             context.Ads.Remove(ad);
             await context.SaveChangesAsync();
 
@@ -103,6 +111,7 @@ namespace PetCare.Core.Services.Ads
             return new AdResponseModel()
             {
                 Id = ad.Id,
+                OwnerId = ad.OwnerId,
                 Title = ad.Title,
                 Description = ad.Description,
                 EndDate = ad.EndDate,
@@ -118,15 +127,16 @@ namespace PetCare.Core.Services.Ads
 
         public async Task<List<AdResponseModel>> GetAllAdsAsync()
         {
-            var ads = await context.Ads.AsNoTracking().Select(a=>new AdResponseModel()
+            var ads = await context.Ads.AsNoTracking().Select(a => new AdResponseModel()
             {
-                Id  =a.Id,
+                Id = a.Id,
+                OwnerId = a.OwnerId,
                 Title = a.Title,
-                Description=a.Description,
+                Description = a.Description,
                 EndDate = a.EndDate,
                 StartDate = a.StartDate,
                 Price = a.Price,
-                IsTrue =true,
+                IsTrue = true,
                 ServiceType = a.TypeService,
                 Xcordinates = a.Xcordinates,
                 Ycordinates = a.Ycordinates,
@@ -166,12 +176,16 @@ namespace PetCare.Core.Services.Ads
             context.Ads.Update(currentAd);
             await context.SaveChangesAsync();
         }
-        private string GetCurrentUserId()
+        private string? GetCurrentUserId()
         {
-            return httpContextAccessor
-                .HttpContext?
-                .User?
-                .FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = httpContextAccessor.HttpContext?.User;
+            if (user == null) return null;
+
+            // .NET 9 JsonWebTokenHandler may not remap short JWT claim names unless
+            // MapInboundClaims=true. Try full CLR type, then short names as fallback.
+            return user.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? user.FindFirstValue("nameid")
+                ?? user.FindFirstValue("sub");
         }
     }
 }

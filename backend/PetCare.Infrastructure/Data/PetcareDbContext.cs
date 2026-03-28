@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PetCare.Infrastructure.Data.Models;
@@ -13,6 +13,8 @@ namespace PetCare.Infrastructure.Data
         }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Ad> Ads { get; set; }
+        public virtual DbSet<Message> Messages { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -23,6 +25,11 @@ namespace PetCare.Infrastructure.Data
                 .HasForeignKey(o => o.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Message>()
+                .HasIndex(m => m.RecipientId);
+
+            builder.Entity<Message>()
+                .HasIndex(m => m.SenderId);
         }
 
     }

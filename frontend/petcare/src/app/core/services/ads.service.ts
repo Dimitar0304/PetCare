@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map, of, shareReplay, tap, timeout } from 'rxjs';
 
 import { Ad, AdDto, AdServiceType, CreateAdPayload } from '../../models/ad.models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AdsService {
-  private readonly apiBase = 'https://localhost:5001/api';
+  private readonly apiBase = environment.apiBase;
   private readonly adsUrl = `${this.apiBase}/Ad`;
 
   constructor(private readonly http: HttpClient) {}
@@ -43,7 +44,10 @@ export class AdsService {
   createAd(payload: CreateAdPayload): Observable<Ad> {
     return this.http.post<AdDto>(`${this.adsUrl}/create`, payload).pipe(
       timeout(8000),
-      map((dto) => this.mapToAd(dto)!)
+      map((dto) => {
+        this.adsCache$ = undefined;
+        return this.mapToAd(dto)!;
+      })
     );
   }
 
@@ -60,23 +64,20 @@ export class AdsService {
   }
 
   private mapToAd(dto: AdDto): Ad | null {
+    if (!dto.id || !dto.town) return null;
+
     const latitude = dto.ycordinates != null ? Number(dto.ycordinates) : undefined;
     const longitude = dto.xcordinates != null ? Number(dto.xcordinates) : undefined;
 
-    // Basic guard: requirement expects lat/lng/city; if missing we won't show marker.
-    if (!dto.town) return null;
-    if (latitude == null || longitude == null || Number.isNaN(latitude) || Number.isNaN(longitude)) {
-      return null;
-    }
-
     return {
       id: dto.id,
+      ownerId: dto.ownerId,
       title: dto.title,
       description: dto.description,
       serviceType: dto.serviceType as AdServiceType,
       city: dto.town,
-      latitude,
-      longitude,
+      latitude: latitude != null && !Number.isNaN(latitude) ? latitude : undefined,
+      longitude: longitude != null && !Number.isNaN(longitude) ? longitude : undefined,
       price: dto.price,
       startDate: dto.startDate ?? null,
       endDate: dto.endDate ?? null,
