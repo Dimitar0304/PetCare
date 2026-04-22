@@ -57,6 +57,14 @@ import { LoginPayload } from '../../models/auth.models';
     </div>
   `,
 })
+/**
+ * Login page.
+ *
+ * Collects email + password, delegates authentication to {@link AuthService}
+ * and navigates to `/ads` on success. Validation errors from the backend
+ * (any of the common shapes: `error` string, `errors[]`, `Errors[]`, or
+ * `message`) are normalized into a single user-facing message.
+ */
 export class LoginComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
@@ -76,6 +84,10 @@ export class LoginComponent {
     return this.form.controls.password;
   }
 
+  /**
+   * Submits the login form. Does nothing when the form is invalid; on success
+   * the user is redirected to the ads list.
+   */
   onSubmit(): void {
     if (this.form.invalid) return;
     this.loading = true;
@@ -92,6 +104,10 @@ export class LoginComponent {
     });
   }
 
+  /**
+   * Extracts a user-friendly error message from a heterogeneous backend
+   * error payload, falling back to a generic login-failed message.
+   */
   private getApiErrorMessage(err: unknown): string {
     const e = err as any;
     if (typeof e?.error === 'string') return e.error;

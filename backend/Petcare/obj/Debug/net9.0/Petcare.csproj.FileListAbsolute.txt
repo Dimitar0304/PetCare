@@ -41,7 +41,6 @@ C:\Users\lasss\Desktop\Petcare\backend\Petcare\obj\Debug\net9.0\staticwebassets\
 C:\Users\lasss\Desktop\Petcare\backend\Petcare\obj\Debug\net9.0\staticwebassets\msbuild.buildMultiTargeting.Petcare.props
 C:\Users\lasss\Desktop\Petcare\backend\Petcare\obj\Debug\net9.0\staticwebassets\msbuild.buildTransitive.Petcare.props
 C:\Users\lasss\Desktop\Petcare\backend\Petcare\obj\Debug\net9.0\staticwebassets.pack.json
-C:\Users\lasss\Desktop\Petcare\backend\Petcare\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 C:\Users\lasss\Desktop\Petcare\backend\Petcare\obj\Debug\net9.0\Petcare.csproj.Up2Date
 C:\Users\lasss\Desktop\Petcare\backend\Petcare\obj\Debug\net9.0\Petcare.dll
 C:\Users\lasss\Desktop\Petcare\backend\Petcare\obj\Debug\net9.0\refint\Petcare.dll

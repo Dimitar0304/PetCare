@@ -10,6 +10,11 @@ import { BrowserModule } from '@angular/platform-browser';
   templateUrl: './login-component.html',
   imports:[BrowserModule,FormsModule,RouterModule]
 })
+/**
+ * Legacy login page backed by the older template-driven {@link AuthService}
+ * under `src/app/services/`. The modern flow uses
+ * `src/app/auth/login/login.component.ts` with reactive forms.
+ */
 export class LoginComponent {
   username = '';
   password = '';
@@ -17,6 +22,10 @@ export class LoginComponent {
 
   constructor(private authService: AuthService, private router: Router) {}
 
+  /**
+   * Calls the legacy auth service and navigates home on success or sets a
+   * generic error message on failure.
+   */
   login() {
     this.authService.login(this.username, this.password).subscribe({
       next: () => {

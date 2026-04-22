@@ -1,9 +1,20 @@
+/**
+ * Single Bulgarian city with its approximate geographic coordinates.
+ * Used by the weather picker, map defaults and autocomplete inputs.
+ */
 export interface BgCity {
   name: string;
+  /** Latitude in decimal degrees (WGS84). */
   lat: number;
+  /** Longitude in decimal degrees (WGS84). */
   lng: number;
 }
 
+/**
+ * Static list of major Bulgarian cities displayed in the UI. The data is
+ * kept client-side because it's small, rarely changes and shouldn't require
+ * a network call to populate dropdowns.
+ */
 export const BG_CITIES: BgCity[] = [
   { name: 'Sofia', lat: 42.6977, lng: 23.3219 },
   { name: 'Plovdiv', lat: 42.1354, lng: 24.7453 },

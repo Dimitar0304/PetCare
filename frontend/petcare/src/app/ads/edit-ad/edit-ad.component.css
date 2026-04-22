@@ -1,0 +1,43 @@
+/* ===== EditAdComponent ===== */
+
+:host {
+  display: block;
+}
+
+/* Map */
+.map-container {
+  height: 540px;
+  border-radius: 0.6rem;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* City autocomplete dropdown */
+.city-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  max-height: 220px;
+  overflow-y: auto;
+  border-radius: 0 0 0.5rem 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.city-dropdown .list-group-item:hover {
+  background-color: #f0f4ff;
+}
+
+/* Coordinate fields (read-only) */
+input[readonly] {
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+@media (max-width: 991.98px) {
+  .map-container {
+    height: 300px;
+  }
+}
+

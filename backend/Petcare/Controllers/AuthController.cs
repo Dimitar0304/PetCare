@@ -6,96 +6,84 @@ using PetCare.Core.Models;
 using PetCare.Core.Services.Contracts;
 using PetCare.Infrastructure.Data.Models;
 
-namespace Petcare.Controllers
+namespace Petcare.Controllers;
+
+/// <summary>
+/// Authentication endpoints under <c>/api/Auth</c>. Issues JWT access tokens on
+/// successful login/register and exposes a best-effort logout hook for clients.
+/// </summary>
+[ApiController]
+[Route("api/[controller]")]
+public sealed class AuthController(
+    UserManager<User> manager,
+    SignInManager<User> signInManager,
+    IJwtService service) : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    private const string InvalidCredentials = "Invalid email or password";
+
+    /// <summary>Authenticates a user by email and password and returns a JWT token on success.</summary>
+    [AllowAnonymous]
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginRequest model)
     {
-        private readonly UserManager<User> manager;
-        private readonly SignInManager<User> signInManager;
-        private readonly IJwtService service;
+        var user = await manager.FindByEmailAsync(model.Email);
+        if (user is null) return Unauthorized(InvalidCredentials);
 
-        public AuthController(UserManager<User> _manager,SignInManager<User>_signInManager,
-            IJwtService _service)
-        {
-            manager = _manager;
-            signInManager = _signInManager;
-            service = _service;
-        }
-        [AllowAnonymous]
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequest model)
-        {
-            var user = await manager.FindByEmailAsync(model.Email);
+        var result = await signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: false);
+        if (!result.Succeeded) return Unauthorized(InvalidCredentials);
 
-            if (user == null)
-            {
-                return Unauthorized("Invalid email or password");
-            }
-
-            var result =await signInManager.CheckPasswordSignInAsync(user, model.Password,false);
-
-            if(!result.Succeeded)
-            {
-                return Unauthorized("Invalid email or password");
-            }
-
-            var token = service.GenerateToken(user);
-
-            return Ok(new AuthResponse()
-            {
-                Token = token,
-                IsAuthenticated = true,
-                UserId = user.Id
-            });
-        }
-        [AllowAnonymous]
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterUserRequest model)
-        {
-            var user = new User()
-            {
-                Email = model.Email,
-                PhoneNumber = model.Phone,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                PasswordHash = model.Password,
-                UserName =model.UserName
-            };
-            if (model.Role == "Petcarer")
-            {
-                user.Role = 1;
-            }
-            else if (model.Role == "PetOwner")
-            {
-                user.Role = 2;
-            }
-            var result = await manager.CreateAsync(user, model.Password);
-
-            if (!result.Succeeded)
-            {
-                return BadRequest(new AuthResponse()
-                {
-                    Errors = new List<string>()
-                    {
-                        "Invalid credentials!"
-                    }
-                });
-            }
-            return Ok(new AuthResponse()
-            {
-                IsAuthenticated = true,
-                UserId = user.Id,
-                Token = service.GenerateToken(user)
-            });
-        }
-
-        [Authorize]
-        [HttpPost("logout")]
-        public IActionResult Logout()
-        {
-            return Ok(new { messsage = "Logged out successfully" });
-        }
+        return Ok(BuildAuthResponse(user));
     }
+
+    /// <summary>Registers a new user account and issues an initial JWT token.</summary>
+    [AllowAnonymous]
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(RegisterUserRequest model)
+    {
+        var user = new User
+        {
+            Email = model.Email,
+            PhoneNumber = model.Phone,
+            FirstName = model.FirstName,
+            LastName = model.LastName,
+            PasswordHash = model.Password,
+            UserName = model.UserName,
+            Role = MapRole(model.Role),
+        };
+
+        var result = await manager.CreateAsync(user, model.Password);
+        if (!result.Succeeded)
+        {
+            return BadRequest(new AuthResponse
+            {
+                Errors = new List<string> { "Invalid credentials!" }
+            });
+        }
+
+        return Ok(BuildAuthResponse(user));
+    }
+
+    /// <summary>
+    /// Stateless logout hook. Token invalidation is handled client-side (the JWT is
+    /// simply discarded); this endpoint exists so clients can confirm the session
+    /// termination succeeded server-side as well.
+    /// </summary>
+    [Authorize]
+    [HttpPost("logout")]
+    public IActionResult Logout() =>
+        Ok(new { messsage = "Logged out successfully" });
+
+    private AuthResponse BuildAuthResponse(User user) => new()
+    {
+        Token = service.GenerateToken(user),
+        IsAuthenticated = true,
+        UserId = user.Id,
+    };
+
+    private static int MapRole(string? role) => role switch
+    {
+        "Petcarer" => 1,
+        "PetOwner" => 2,
+        _ => 0,
+    };
 }

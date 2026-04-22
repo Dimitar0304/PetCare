@@ -55,3 +55,9 @@ input[readonly] {
   font-weight: 600;
   letter-spacing: 0.03em;
 }
+
+@media (max-width: 991.98px) {
+  .map-container {
+    height: 300px;
+  }
+}

@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   FormControl,
   FormGroup,
@@ -10,6 +10,8 @@ import {
 import { finalize } from 'rxjs';
 
 import { MessageService } from '../core/services/message.service';
+import { UiPreferencesService } from '../core/services/ui-preferences.service';
+import { TPipe } from '../core/i18n/t.pipe';
 import { MessageDto } from '../models/message.models';
 
 type Tab = 'inbox' | 'sent';
@@ -17,15 +19,20 @@ type Tab = 'inbox' | 'sent';
 @Component({
   selector: 'app-inbox',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, TPipe],
   styleUrl: './inbox.component.css',
   template: `
     <div class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-4">
-        <h2 class="mb-0">Inbox</h2>
-        <button class="btn btn-primary btn-sm" type="button" (click)="openCompose()">
-          ✉ New Message
-        </button>
+        <h2 class="mb-0">{{ 'inbox.title' | t }}</h2>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-dark btn-sm" type="button" (click)="ui.toggleSimplified()">
+            {{ (ui.prefs$ | async)?.simplified ? ('common.standardView' | t) : ('common.simpleView' | t) }}
+          </button>
+          <button class="btn btn-primary btn-sm" type="button" (click)="openCompose()">
+            ✉ {{ 'inbox.newMessage' | t }}
+          </button>
+        </div>
       </div>
 
       <!-- Compose panel -->
@@ -70,9 +77,8 @@ type Tab = 'inbox' | 'sent';
             <div class="alert alert-success" *ngIf="sendSuccess">Message sent!</div>
 
             <div class="d-flex gap-2 justify-content-end">
-              <button class="btn btn-secondary btn-sm" type="button" (click)="closeCompose()">Cancel</button>
-              <button class="btn btn-primary btn-sm" type="submit"
-                [disabled]="composeForm.invalid || sending">
+              <button class="btn btn-secondary" type="button" (click)="closeCompose()">Cancel</button>
+              <button class="btn btn-primary" type="submit" [disabled]="composeForm.invalid || sending">
                 {{ sending ? 'Sending…' : 'Send' }}
               </button>
             </div>
@@ -84,13 +90,13 @@ type Tab = 'inbox' | 'sent';
       <ul class="nav nav-tabs mb-3">
         <li class="nav-item">
           <button class="nav-link" [class.active]="activeTab === 'inbox'" (click)="switchTab('inbox')">
-            Inbox
+            {{ 'inbox.inboxTab' | t }}
             <span class="badge bg-danger ms-1" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
           </button>
         </li>
         <li class="nav-item">
           <button class="nav-link" [class.active]="activeTab === 'sent'" (click)="switchTab('sent')">
-            Sent
+            {{ 'inbox.sentTab' | t }}
           </button>
         </li>
       </ul>
@@ -130,7 +136,7 @@ type Tab = 'inbox' | 'sent';
       </div>
 
       <!-- Selected message detail -->
-      <div class="card mt-4" *ngIf="selectedMsg">
+      <div class="card mt-4" *ngIf="selectedMsg && !(ui.prefs$ | async)?.simplified">
         <div class="card-header d-flex justify-content-between align-items-center">
           <strong>{{ selectedMsg.subject }}</strong>
           <button class="btn-close" type="button" (click)="selectedMsg = null"></button>
@@ -155,9 +161,18 @@ type Tab = 'inbox' | 'sent';
     </div>
   `,
 })
+/**
+ * Messaging inbox with inbox/sent tabs and an inline compose drawer.
+ *
+ * The active tab and the compose-drawer state can be driven via query
+ * parameters (`?tab=sent`, `?compose=true&to=...`) so other parts of the
+ * app can deep-link into the inbox with a pre-filled recipient.
+ */
 export class InboxComponent implements OnInit {
   private readonly messageService = inject(MessageService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  readonly ui = inject(UiPreferencesService);
 
   activeTab: Tab = 'inbox';
   messages: MessageDto[] = [];
@@ -182,7 +197,14 @@ export class InboxComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    let initialized = false;
     this.route.queryParams.subscribe((params) => {
+      const rawTab = String(params['tab'] ?? '').toLowerCase();
+      const nextTab: Tab = rawTab === 'sent' ? 'sent' : 'inbox';
+
+      const tabChanged = this.activeTab !== nextTab;
+      this.activeTab = nextTab;
+
       if (params['compose'] === 'true') {
         this.openCompose();
         const to = params['to'];
@@ -190,17 +212,30 @@ export class InboxComponent implements OnInit {
           this.composeForm.patchValue({ recipientEmail: to });
         }
       }
+
+      if (!initialized || tabChanged) {
+        initialized = true;
+        this.selectedMsg = null;
+        this.loadMessages();
+      }
     });
-    this.loadMessages();
   }
 
+  /**
+   * Switches tabs by updating the URL's `tab` query parameter so the tab
+   * selection survives browser navigation (back/forward/refresh).
+   */
   switchTab(tab: Tab): void {
     if (this.activeTab === tab) return;
-    this.activeTab = tab;
-    this.selectedMsg = null;
-    this.loadMessages();
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab, compose: null, to: null },
+      queryParamsHandling: 'merge',
+    });
   }
 
+  /** Opens the compose drawer and resets the form. */
   openCompose(): void {
     this.composeForm.reset();
     this.sendError = null;
@@ -208,10 +243,15 @@ export class InboxComponent implements OnInit {
     this.showCompose = true;
   }
 
+  /** Closes the compose drawer without clearing form state. */
   closeCompose(): void {
     this.showCompose = false;
   }
 
+  /**
+   * Submits the compose form. On success shows a brief confirmation,
+   * closes the drawer, and refreshes the sent list if that tab is active.
+   */
   sendMessage(): void {
     if (this.composeForm.invalid) return;
     this.sending = true;
@@ -239,6 +279,10 @@ export class InboxComponent implements OnInit {
       });
   }
 
+  /**
+   * Opens a message in the detail pane and, when on the inbox tab, marks
+   * unread messages as read (optimistically decrementing the unread badge).
+   */
   openMessage(msg: MessageDto): void {
     this.selectedMsg = msg;
     if (this.activeTab === 'inbox' && !msg.isRead) {
@@ -249,6 +293,10 @@ export class InboxComponent implements OnInit {
     }
   }
 
+  /**
+   * Opens the compose drawer prefilled with a reply template:
+   * recipient = original sender, subject prefixed with `Re:` if not already.
+   */
   replyTo(msg: MessageDto): void {
     this.composeForm.patchValue({
       recipientEmail: msg.senderEmail,
@@ -261,6 +309,10 @@ export class InboxComponent implements OnInit {
     this.selectedMsg = null;
   }
 
+  /**
+   * Loads the messages for the active tab. Inbox loads also refresh the
+   * local unread counter.
+   */
   private loadMessages(): void {
     this.loading = true;
     this.loadError = null;

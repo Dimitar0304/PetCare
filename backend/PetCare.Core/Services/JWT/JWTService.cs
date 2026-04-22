@@ -6,50 +6,53 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace PetCare.Core.Services.JWT
+namespace PetCare.Core.Services.JWT;
+
+/// <summary>
+/// HMAC-SHA256 signed JWT issuer used by the authentication endpoints.
+/// Reads issuer, audience and signing key from the <c>Jwt</c> configuration section.
+/// </summary>
+public sealed class JWTService(IConfiguration configuration) : IJwtService
 {
-    public class JWTService : IJwtService
+    private static readonly TimeSpan TokenLifetime = TimeSpan.FromDays(7);
+
+    /// <summary>
+    /// Produces a HMAC-SHA256 signed JWT for the given user. The numeric
+    /// <see cref="User.Role"/> is mapped to a readable label (Seeker / Provider / Admin)
+    /// and emitted under both the short <c>role</c> claim (consumed by the Angular client)
+    /// and the standard <see cref="ClaimTypes.Role"/> claim (consumed by ASP.NET authorization).
+    /// </summary>
+    public string GenerateToken(User user)
     {
-        private readonly IConfiguration configuration;
+        var roleLabel = MapRole(user.Role);
 
-        public JWTService(IConfiguration _config)
+        var claims = new List<Claim>
         {
-            configuration = _config;
-        }
-        public string GenerateToken(User user)
-        {
-            var roleLabel = user.Role switch
-            {
-                2 => "Seeker", // PetOwner
-                1 => "Provider", // Petcarer
-                _ => "Provider"
-            };
-
-            var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Email, user.Email),
-            // Keep a simple claim key for the Angular frontend.
-            new Claim("role", roleLabel),
-            // Also include the standard claim type for compatibility with JWT decoders.
-            new Claim(ClaimTypes.Role, roleLabel)
+            new(ClaimTypes.NameIdentifier, user.Id),
+            new(ClaimTypes.Email, user.Email),
+            new("role", roleLabel),
+            new(ClaimTypes.Role, roleLabel),
         };
 
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(configuration["Jwt:Key"])
-            );
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!));
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var token = new JwtSecurityToken(
+            issuer: configuration["Jwt:Issuer"],
+            audience: configuration["Jwt:Audience"],
+            claims: claims,
+            expires: DateTime.UtcNow.Add(TokenLifetime),
+            signingCredentials: credentials);
 
-            var token = new JwtSecurityToken(
-                issuer: configuration["Jwt:Issuer"],
-                audience: configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddDays(7),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    /// <summary>Maps the internal numeric role to the label consumed by clients and authorization policies.</summary>
+    private static string MapRole(int role) => role switch
+    {
+        1 => "Provider",
+        2 => "Seeker",
+        3 => "Admin",
+        _ => "Provider",
+    };
 }

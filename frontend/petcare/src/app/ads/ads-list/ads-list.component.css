@@ -68,3 +68,15 @@
   background: #dee2e6;
   border-radius: 2px;
 }
+
+@media (max-width: 991.98px) {
+  .map-container {
+    height: 300px;
+  }
+
+  .ads-scroll {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+}

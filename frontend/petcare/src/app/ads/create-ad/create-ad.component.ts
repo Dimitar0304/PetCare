@@ -38,7 +38,7 @@ import { BG_CITIES, BgCity } from '../../core/data/bg-cities';
 
       <div class="row g-3">
         <div class="col-lg-8">
-          <div #mapEl class="border rounded" style="height: 540px;"></div>
+          <div #mapEl class="map-container"></div>
           <div class="text-muted small mt-2">
             Click on the map or select a city to set the location.
           </div>
@@ -79,8 +79,7 @@ import { BG_CITIES, BgCity } from '../../core/data/bg-cities';
 
               <div
                 *ngIf="citySuggestions.length > 0"
-                class="list-group position-absolute w-100 shadow"
-                style="z-index: 1000; top: 100%; max-height: 220px; overflow-y: auto;"
+                class="city-dropdown list-group"
               >
                 <button
                   class="list-group-item list-group-item-action py-2"
@@ -144,6 +143,14 @@ import { BG_CITIES, BgCity } from '../../core/data/bg-cities';
     </div>
   `,
 })
+/**
+ * Create-ad form. Restricted to users with the `Seeker` role.
+ *
+ * Coordinates can be chosen either by typing a city (which auto-fills from
+ * {@link BG_CITIES}) or by clicking on the Leaflet map. The backend stores
+ * coordinates as nullable strings, which is why they are sent as strings in
+ * the payload mapping below.
+ */
 export class CreateAdComponent implements AfterViewInit, OnDestroy {
   private readonly adsService = inject(AdsService);
   private readonly router = inject(Router);
@@ -192,6 +199,7 @@ export class CreateAdComponent implements AfterViewInit, OnDestroy {
     this.map?.remove();
   }
 
+  /** Updates the city suggestion list based on the current input value. */
   onCityInput(): void {
     const val = this.form.controls.city.value.trim().toLowerCase();
     if (!val || val.length < 1) {
@@ -203,11 +211,16 @@ export class CreateAdComponent implements AfterViewInit, OnDestroy {
       .slice(0, 8);
   }
 
+  /**
+   * Hides the suggestion dropdown on blur. Uses a small delay so a click
+   * on a suggestion (which fires `mousedown` before `blur`) still wins.
+   */
   onCityBlur(): void {
     // Delay to let mousedown on suggestion fire first
     setTimeout(() => { this.citySuggestions = []; }, 150);
   }
 
+  /** Applies the selected suggestion to the form and centers the map. */
   selectCity(city: BgCity): void {
     this.form.patchValue({
       city: city.name,
@@ -218,6 +231,11 @@ export class CreateAdComponent implements AfterViewInit, OnDestroy {
     this.placeMarker(city.lat, city.lng, true);
   }
 
+  /**
+   * Initializes a Leaflet map fitted to Bulgaria's bounding box. Clicking on
+   * the map updates the latitude/longitude form controls and re-places the
+   * marker.
+   */
   private initMap(): void {
     const boundsBulgaria: [[number, number], [number, number]] = [
       [41.18, 20.1],
@@ -246,6 +264,11 @@ export class CreateAdComponent implements AfterViewInit, OnDestroy {
     if (pan) this.map?.setView([lat, lng], 12);
   }
 
+  /**
+   * Validates the form, ensures the current user holds the `Seeker` role and
+   * submits the payload to the backend. On success the user is redirected to
+   * the ad listing with a `justCreated` state flag so the list is refreshed.
+   */
   onSubmit(): void {
     this.form.markAllAsTouched();
     this.apiError = null;

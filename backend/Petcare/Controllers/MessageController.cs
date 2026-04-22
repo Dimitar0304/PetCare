@@ -3,60 +3,51 @@ using Microsoft.AspNetCore.Mvc;
 using PetCare.Core.Models;
 using PetCare.Core.Services.Contracts;
 
-namespace Petcare.Controllers
+namespace Petcare.Controllers;
+
+/// <summary>
+/// Endpoints for the private messaging feature under <c>/api/Message</c>.
+/// All endpoints require authentication.
+/// </summary>
+[ApiController]
+[Route("api/[controller]")]
+[Authorize]
+public sealed class MessageController(IMessageService messageService) : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    [Authorize]
-    public class MessageController : ControllerBase
+    /// <summary>Sends a new message to the recipient identified by email.</summary>
+    [HttpPost("send")]
+    public async Task<IActionResult> Send([FromBody] SendMessageRequest request)
     {
-        private readonly IMessageService messageService;
-
-        public MessageController(IMessageService messageService)
+        try
         {
-            this.messageService = messageService;
+            return Ok(await messageService.SendMessageAsync(request));
         }
-
-        [HttpPost("send")]
-        public async Task<IActionResult> Send([FromBody] SendMessageRequest request)
+        catch (InvalidOperationException ex)
         {
-            try
-            {
-                var result = await messageService.SendMessageAsync(request);
-                return Ok(result);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-        }
-
-        [HttpGet("inbox")]
-        public async Task<IActionResult> GetInbox()
-        {
-            var messages = await messageService.GetInboxAsync();
-            return Ok(messages);
-        }
-
-        [HttpGet("sent")]
-        public async Task<IActionResult> GetSent()
-        {
-            var messages = await messageService.GetSentAsync();
-            return Ok(messages);
-        }
-
-        [HttpPost("read/{id}")]
-        public async Task<IActionResult> MarkAsRead(string id)
-        {
-            await messageService.MarkAsReadAsync(id);
-            return Ok();
-        }
-
-        [HttpGet("unread-count")]
-        public async Task<IActionResult> GetUnreadCount()
-        {
-            var count = await messageService.GetUnreadCountAsync();
-            return Ok(new { count });
+            return BadRequest(new { error = ex.Message });
         }
     }
+
+    /// <summary>Returns the current user's inbox, newest first.</summary>
+    [HttpGet("inbox")]
+    public async Task<ActionResult<List<MessageResponseModel>>> GetInbox() =>
+        Ok(await messageService.GetInboxAsync());
+
+    /// <summary>Returns the messages the current user has sent, newest first.</summary>
+    [HttpGet("sent")]
+    public async Task<ActionResult<List<MessageResponseModel>>> GetSent() =>
+        Ok(await messageService.GetSentAsync());
+
+    /// <summary>Marks a message as read. No-op when the message does not exist or is not addressed to the current user.</summary>
+    [HttpPost("read/{id}")]
+    public async Task<IActionResult> MarkAsRead(string id)
+    {
+        await messageService.MarkAsReadAsync(id);
+        return Ok();
+    }
+
+    /// <summary>Returns the number of unread messages for the current user.</summary>
+    [HttpGet("unread-count")]
+    public async Task<IActionResult> GetUnreadCount() =>
+        Ok(new { count = await messageService.GetUnreadCountAsync() });
 }

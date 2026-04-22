@@ -9,6 +9,13 @@ import { NgIf } from '@angular/common';
   standalone:true,
   imports:[NgIf]
 })
+/**
+ * Legacy home page (retained for backwards compatibility).
+ *
+ * Uses the older {@link AuthService} located under `src/app/services/` to
+ * display the current user's name. The modern application shell routes
+ * users directly to the ads list instead.
+ */
 export class HomeComponent implements OnInit {
   username = '';
 
@@ -24,6 +31,7 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  /** Clears the session locally and returns the user to the home page. */
   logout() {
     this.auth.logout();
     this.username = '';

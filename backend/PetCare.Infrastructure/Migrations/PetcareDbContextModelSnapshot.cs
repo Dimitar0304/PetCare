@@ -198,7 +198,13 @@ namespace PetCare.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedOn");
+
                     b.HasIndex("OwnerId");
+
+                    b.HasIndex("Town");
+
+                    b.HasIndex("TypeService");
 
                     b.ToTable("Ads");
                 });
@@ -242,6 +248,8 @@ namespace PetCare.Infrastructure.Migrations
                     b.HasIndex("RecipientId");
 
                     b.HasIndex("SenderId");
+
+                    b.HasIndex("RecipientId", "IsRead");
 
                     b.ToTable("Messages");
                 });

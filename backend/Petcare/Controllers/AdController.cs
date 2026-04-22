@@ -2,105 +2,78 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PetCare.Core.Models;
 using PetCare.Core.Services.Contracts;
-using System.DirectoryServices.Protocols;
-using System.Threading.Tasks;
 
-namespace Petcare.Controllers
+namespace Petcare.Controllers;
+
+/// <summary>
+/// Exposes CRUD endpoints for pet-care advertisements under <c>/api/Ad</c>.
+/// Read operations are anonymous; write operations require an authenticated user
+/// and verify ownership in the service layer.
+/// </summary>
+[ApiController]
+[Route("api/[controller]")]
+public sealed class AdController(IAdService service) : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AdController:ControllerBase
+    /// <summary>Returns a paged list of advertisements ordered by creation date (newest first).</summary>
+    [AllowAnonymous]
+    [HttpGet("getAll")]
+    public async Task<ActionResult<PagedResult<AdResponseModel>>> Get(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20) =>
+        Ok(await service.GetAdsPageAsync(page, pageSize));
+
+    /// <summary>Creates a new advertisement for the current user.</summary>
+    [Authorize]
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateAd([FromBody] AdRequestModel model)
     {
-        private readonly IAdService service;
+        if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        public AdController(IAdService _service)
+        var result = await service.CreateAnAdAsync(model);
+        return result.IsTrue ? Ok(result) : BadRequest();
+    }
+
+    /// <summary>Updates an existing advertisement owned by the current user.</summary>
+    [Authorize]
+    [HttpPut("update/{id}")]
+    public async Task<IActionResult> UpdateAd([FromRoute] string id, [FromBody] AdRequestModel model)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        try
         {
-            service = _service;
+            return Ok(await service.UpdateAdAsync(id, model));
         }
+        catch (UnauthorizedAccessException) { return Forbid(); }
+        catch (ArgumentNullException) { return NotFound(); }
+    }
 
-        [AllowAnonymous]
-        [HttpGet("getAll")]
-        public async Task<ActionResult<List<AddResponse>>>Get()
+    /// <summary>Deletes an advertisement owned by the current user.</summary>
+    [Authorize]
+    [HttpPost("delete")]
+    public async Task<IActionResult> DeleteAdById(string id)
+    {
+        if (id is null) return BadRequest();
+
+        try
         {
-            var ads = await service.GetAllAdsAsync();
-
-            return Ok(ads);
+            await service.DeleteAdAsync(id);
+            return Ok();
         }
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateAd([FromBody] AdRequestModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var result = await service.CreateAnAdAsync(model);
-            if (!result.IsTrue)
-            {
-                return BadRequest();
-            }
-            return Ok(result);
-        }
+        catch (UnauthorizedAccessException) { return Forbid(); }
+        catch (ArgumentNullException) { return NotFound(); }
+    }
 
-        [HttpPost("update")]
-        public async Task<IActionResult> UpdateAd([FromBody] AdRequestModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            string adId = service.GetAllAdsAsync()
-                .Result.Where(c => c.Title == model.Title && c.Description == model.Description)
-                .FirstOrDefault().Id;
+    /// <summary>Retrieves a single advertisement by id.</summary>
+    [HttpGet("getById")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetByIdAsync(string id)
+    {
+        if (id is null) return BadRequest();
 
-            var result = service.UpdateAdAsync(model, adId);
+        var result = await service.GetAdByIdAsync(id);
+        if (result is null || !result.IsTrue) return NotFound();
 
-            if (!result.IsCompleted)
-            {
-                return BadRequest();
-            }
-
-            return Ok(result);
-        }
-
-        [HttpPost("delete")]
-        public async Task<IActionResult> DeleteAdById(string id)
-        {
-            if (id == null)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                await service.DeleteAdAsync(id);
-                return Ok();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Forbid();
-            }
-            catch (ArgumentNullException)
-            {
-                return NotFound();
-            }
-        }
-        [HttpGet("getById")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetByIdAsync(string id)
-        {
-            if (id == null)
-            {
-                return BadRequest();
-            }
-
-            var result = await service.GetAdByIdAsync(id);
-
-            if (result == null)
-            {
-                return BadRequest();
-            }
-
-            return Ok(result);
-        }
+        return Ok(result);
     }
 }

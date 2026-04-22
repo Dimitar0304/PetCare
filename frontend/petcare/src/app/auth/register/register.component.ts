@@ -88,6 +88,14 @@ import { BackendRoles, LoginPayload, RegisterPayload, UserRole } from '../../mod
     </div>
   `,
 })
+/**
+ * Registration page.
+ *
+ * Collects the profile fields required by the backend and maps the UI role
+ * ("Seeker" / "Provider") to the numeric role expected by the server
+ * (via {@link BackendRoles}) before calling {@link AuthService.register}.
+ * On success the new user is auto-logged-in and redirected to `/ads`.
+ */
 export class RegisterComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
@@ -118,6 +126,10 @@ export class RegisterComponent {
     return this.form.controls.password;
   }
 
+  /**
+   * Submits the registration form. Translates the UI-facing role string
+   * into the backend enum value and ignores the call while the form is invalid.
+   */
   onSubmit(): void {
     if (this.form.invalid) return;
     this.loading = true;
@@ -145,6 +157,10 @@ export class RegisterComponent {
     });
   }
 
+  /**
+   * Normalizes the various error shapes produced by ASP.NET Identity /
+   * model-validation into a single message suitable for display.
+   */
   private getApiErrorMessage(err: unknown): string {
     const e = err as any;
     if (typeof e?.error === 'string') return e.error;

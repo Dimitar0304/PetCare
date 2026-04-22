@@ -31,6 +31,11 @@ services:
       Jwt__Key: "SUPER_SECRET_KEY_1234567893443434"
       Jwt__Issuer: "PetCareAPI"
       Jwt__Audience: "PetCareClient"
+      # OpenWeather API key for the /api/weatherai endpoint.
+      # Put OPENWEATHER_API_KEY=<your_key> in a .env file next to docker-compose.yml.
+      # If left empty, the weather widget falls back to a deterministic demo dataset
+      # so the UI still visualizes something on first run.
+      OpenWeather__ApiKey: "${OPENWEATHER_API_KEY:-}"
     depends_on:
       db:
         condition: service_healthy

@@ -1,1 +1,32 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
+
+/* ===== Grandpa-friendly theme: High Contrast ===== */
+body.high-contrast {
+  background: #ffffff;
+  color: #000000;
+}
+
+body.high-contrast .text-muted {
+  color: #222 !important;
+}
+
+body.high-contrast .card,
+body.high-contrast .list-group-item,
+body.high-contrast .form-control,
+body.high-contrast .form-select,
+body.high-contrast .navbar {
+  border-color: #000 !important;
+}
+
+body.high-contrast .btn {
+  font-weight: 700;
+}
+
+body.high-contrast .btn:focus,
+body.high-contrast .form-control:focus,
+body.high-contrast .form-select:focus {
+  outline: 3px solid #ffbf00 !important;
+  outline-offset: 2px;
+  box-shadow: none !important;
+}
+

@@ -1,0 +1,17 @@
+{"sessionId":"ef5b52","location":"ads-list.component.ts:ngDoCheck","message":"ngDoCheck fired","data":{"count":1},"hypothesisId":"H-C","timestamp":1774518614529}
+{"sessionId":"ef5b52","location":"ads-list.component.ts:ngDoCheck","message":"ngDoCheck fired","data":{"count":2},"hypothesisId":"H-C","timestamp":1774518614555}
+{"sessionId":"ef5b52","location":"ads-list.component.ts:loadAds","message":"loadAds started","data":{"force":false},"hypothesisId":"H-D","timestamp":1774518624544}
+{"sessionId":"ef5b52","location":"ads-list.component.ts:ngDoCheck","message":"ngDoCheck fired","data":{"count":1},"hypothesisId":"H-C","timestamp":1774518624548}
+{"sessionId":"ef5b52","location":"ads-list.component.ts:ngDoCheck","message":"ngDoCheck fired","data":{"count":2},"hypothesisId":"H-C","timestamp":1774518624577}
+{"sessionId":"ef5b52","location":"ads-list.component.ts:loadAds.finalize","message":"loadAds finalized","data":{"elapsed_ms":51,"adsCount":5},"hypothesisId":"H-D","timestamp":1774518624595}
+{"sessionId":"ef5b52","location":"ads-list.component.ts:loadAds","message":"loadAds started","data":{"force":false},"hypothesisId":"H-D","timestamp":1774518666721}
+{"sessionId":"ef5b52","location":"ads-list.component.ts:ngDoCheck","message":"ngDoCheck fired","data":{"count":1},"hypothesisId":"H-C","timestamp":1774518666725}
+{"sessionId":"ef5b52","location":"ads-list.component.ts:ngDoCheck","message":"ngDoCheck fired","data":{"count":2},"hypothesisId":"H-C","timestamp":1774518666751}
+{"sessionId":"ef5b52","location":"ads-list.component.ts:loadAds.finalize","message":"loadAds finalized","data":{"elapsed_ms":59,"adsCount":5},"hypothesisId":"H-D","timestamp":1774518666780}
+{"sessionId":"ef5b52","location":"ads-list.component.ts:loadAds","message":"loadAds started","data":{"force":false},"hypothesisId":"H-D","timestamp":1774518732396}
+{"sessionId":"ef5b52","location":"ads-list.component.ts:ngDoCheck","message":"ngDoCheck fired","data":{"count":1},"hypothesisId":"H-C","timestamp":1774518732398}
+{"sessionId":"ef5b52","location":"ads-list.component.ts:ngDoCheck","message":"ngDoCheck fired","data":{"count":2},"hypothesisId":"H-C","timestamp":1774518732413}
+{"sessionId":"ef5b52","location":"ads-list.component.ts:loadAds.finalize","message":"loadAds finalized","data":{"elapsed_ms":54,"adsCount":5},"hypothesisId":"H-D","timestamp":1774518732450}
+{"sessionId":"ef5b52","location":"create-ad.component.ts:onSubmit","message":"createAd HTTP POST starting","data":{"town":"Pazardjik ","price":30},"hypothesisId":"H-B","timestamp":1774518758017}
+{"sessionId":"ef5b52","location":"ads.service.ts:createAd","message":"POST /create dispatched","data":{"cacheInvalidated":false},"hypothesisId":"H-E","timestamp":1774518758018}
+{"sessionId":"ef5b52","location":"create-ad.component.ts:onSubmit.error","message":"createAd HTTP POST FAILED","data":{"elapsed_ms":136},"hypothesisId":"H-B","timestamp":1774518758153}

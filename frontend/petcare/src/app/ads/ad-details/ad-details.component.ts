@@ -6,6 +6,7 @@ import * as L from 'leaflet';
 import { AdsService } from '../../core/services/ads.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { Ad, AdServiceType } from '../../models/ad.models';
+import { UserRole } from '../../models/auth.models';
 
 @Component({
   selector: 'app-ad-details',
@@ -60,6 +61,14 @@ import { Ad, AdServiceType } from '../../models/ad.models';
                     Message owner
                   </button>
 
+                  <a
+                    class="btn btn-outline-primary"
+                    *ngIf="isOwner && role === 'Seeker'"
+                    [routerLink]="['/ads', ad.id, 'edit']"
+                  >
+                    Edit
+                  </a>
+
                   <button class="btn btn-outline-danger" type="button" *ngIf="isOwner" (click)="deleteAd()">
                     Delete
                   </button>
@@ -81,6 +90,14 @@ import { Ad, AdServiceType } from '../../models/ad.models';
     </div>
   `,
 })
+/**
+ * Ad details page.
+ *
+ * Loads a single advertisement by the `id` route parameter, renders its
+ * information and shows a Leaflet map centered on the ad's location.
+ * Contextual actions (Edit / Delete / Message owner) are shown based on
+ * the current user's role and whether they own the ad.
+ */
 export class AdDetailsComponent implements OnInit, OnDestroy {
   private readonly adsService = inject(AdsService);
   private readonly route = inject(ActivatedRoute);
@@ -94,7 +111,7 @@ export class AdDetailsComponent implements OnInit, OnDestroy {
   apiError: string | null = null;
   ad: Ad | null = null;
 
-  role: 'Seeker' | 'Provider' | null = null;
+  role: UserRole | null = null;
   isOwner = false;
 
   private currentUserId: string | null = null;
@@ -107,6 +124,7 @@ export class AdDetailsComponent implements OnInit, OnDestroy {
     5: 'Something Specific',
   };
 
+  /** Returns the human-readable label for a given service-type code. */
   serviceLabel(type: AdServiceType): string {
     return this.serviceLabels[type] ?? `Type ${type}`;
   }
@@ -129,6 +147,10 @@ export class AdDetailsComponent implements OnInit, OnDestroy {
     this.map?.remove();
   }
 
+  /**
+   * Fetches the advertisement, determines ownership, and renders the map
+   * once Angular has flushed the DOM so the map container exists.
+   */
   private load(id: string): void {
     this.loading = true;
     this.apiError = null;
@@ -154,6 +176,7 @@ export class AdDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
+  /** (Re-)creates a Leaflet map centered on the supplied coordinates. */
   private renderMap(lat: number, lng: number): void {
     if (!this.mapEl) return;
 
@@ -168,6 +191,10 @@ export class AdDetailsComponent implements OnInit, OnDestroy {
     this.marker = L.marker([lat, lng]).addTo(this.map);
   }
 
+  /**
+   * Prompts the user to confirm and then deletes the advertisement. Only
+   * callable by the owner (guarded both here and by the template).
+   */
   deleteAd(): void {
     if (!this.ad || !this.isOwner) return;
 
@@ -180,6 +207,10 @@ export class AdDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Navigates to the inbox with query parameters that tell the inbox page
+   * to open the "compose" drawer pre-filled with the ad owner's email.
+   */
   sendMessage(): void {
     if (!this.ad) return;
     // Pass ownerEmail so InboxComponent can pre-fill the recipient field.

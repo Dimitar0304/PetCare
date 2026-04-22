@@ -1,7 +1,15 @@
 import * as L from 'leaflet';
 
-// Leaflet uses static paths for marker icons. When bundling with Angular,
-// those defaults can break. This config ensures markers render correctly.
+/**
+ * Configures Leaflet to load its default marker icons from a public CDN.
+ *
+ * Leaflet resolves marker assets using static paths relative to the bundle.
+ * When bundled with Angular those paths break, which results in missing
+ * marker images. This helper overrides `L.Icon.Default.prototype._getIconUrl`
+ * so every default marker references stable URLs on unpkg.
+ *
+ * Call once during application bootstrap before rendering any `L.marker`.
+ */
 export function configureLeafletIcons(): void {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const iconDefault = L.Icon.Default;
